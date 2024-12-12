@@ -29,6 +29,6 @@ sync_devices:
     commands:
       - command: "show interface all | as json"
         parser: "none"
-        jpath: "[?ip_address=='{{ obj }}'].prefix_length"
+        jpath: 'interfaces[*].subinterfaces[*].{interface: @.name, ip: "address"[0].prefix}'
         post_processor: "{{ obj | unique | first }}"
         iterable_type: "int"
