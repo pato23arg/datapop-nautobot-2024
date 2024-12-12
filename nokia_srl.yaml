@@ -23,7 +23,7 @@ sync_devices:
     commands:
       - command: "show interface all | as json"
         parser: "none"
-        jpath: "[?ip_address=='{{ obj }}'].{name: interface, enabled: link_status}"
+        jpath: 'interfaces[*].subinterfaces[*].{interface: @.name, ip: "address"[].prefix}'
         post_processor: "{{ (obj | selectattr('enabled', 'eq', 'up') | list | first ).name }}"
   mask_length:
     commands:
