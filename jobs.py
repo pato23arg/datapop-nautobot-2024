@@ -106,7 +106,7 @@ class WayneImportLocations(Job):
         # prefetch objects that will be reused
         state_loc_type = LocationType.objects.filter(name="State").first()
         city_loc_type = LocationType.objects.filter(name="City").first()
-        active_status, _ = Status.objects.filter(name="Active").first()
+        active_status = Status.objects.filter(name="Active").first()
         if not all([state_loc_type, city_loc_type, active_status]):
             raise ValidationError("Base Location Type or Status objects do not exist.")
         for row in reader:
