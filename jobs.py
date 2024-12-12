@@ -185,4 +185,4 @@ class WayneImportLocations(Job):
                 continue            
             
 
-register_jobs(*jobs, ServiceNowContactSync)
+register_jobs(*jobs, WayneImportLocations)
