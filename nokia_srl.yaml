@@ -3,32 +3,32 @@ sync_devices:
   hostname:
     commands:
       - command: "show version | as json"
-        parser: "textfsm"
-        jpath: "[*].hostname"
+        parser: "none"
+        jpath: '"basic system info"[]."Hostname"[].data'
   serial:
     commands:
       - command: "show version | as json"
-        parser: "textfsm"
-        jpath: "[*].serial[]"
-        post_processor: "{{ obj | unique | first }}"
-        iterable_type: "str"
+        parser: "none"
+        jpath: '"basic system info"[]."Serial Number"[].data'
+        #post_processor: "{{ obj | unique | first }}"
+        #iterable_type: "str"
   device_type:
     commands:
       - command: "show version | as json"
-        parser: "textfsm"
-        jpath: "[*].hardware[]"
-        post_processor: "{{ obj | unique | first }}"
-        iterable_type: "str"
+        parser: "none"
+        jpath: '"basic system info"[]."Chassis Type"[].data'
+        #post_processor: "{{ obj | unique | first }}"
+        #iterable_type: "str"
   mgmt_interface:
     commands:
       - command: "show interface all | as json"
-        parser: "textfsm"
+        parser: "none"
         jpath: "[?ip_address=='{{ obj }}'].{name: interface, enabled: link_status}"
         post_processor: "{{ (obj | selectattr('enabled', 'eq', 'up') | list | first ).name }}"
   mask_length:
     commands:
       - command: "show interface all | as json"
-        parser: "textfsm"
+        parser: "none"
         jpath: "[?ip_address=='{{ obj }}'].prefix_length"
         post_processor: "{{ obj | unique | first }}"
         iterable_type: "int"
