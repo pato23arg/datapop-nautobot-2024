@@ -2,7 +2,7 @@
 import csv
 import json
 from nautobot.core.celery import register_jobs
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, IntegrityError
 from nautobot.extras.jobs import BooleanVar, Job, FileVar, ObjectVar, IntegerVar
 from nautobot.extras.models import Status
 from nautobot.dcim.models import Device, Location, LocationType
@@ -102,6 +102,10 @@ class WayneImportLocations(Job):
         # Validate required headers present in CSV
         if not all(header in reader.fieldnames for header in expected_headers):
             raise ValidationError("Missing Required Fields in CSV file.")
+        # prefetch objects that will be reused
+        state_loc_type = LocationType.objects.filter(name="State").first()
+        city_loc_type = LocationType.objects.filter(name="City").first()
+        active_status, _ = Status.objects.get_or_create(name="Active")
         for row in reader:
             # Do data validation per requirements row by row.
             # validation location name
@@ -154,18 +158,18 @@ class WayneImportLocations(Job):
                 )
                 continue
             # Create location and associated Objects.
-            active_status, _ = Status.objects.get_or_create(name="Active")
+            new_loc_type = LocationType.objects.filter(name=location_type__name).first()
             try:
                 state, created = Location.objects.get_or_create(
                     name = state_name,
-                    location_type__name = "State",
+                    location_type = state_loc_type,
                     status = active_status,
                 )
                 if created:
                     state.validated_save()
                 city, created = Location.objects.get_or_create(
                     name = state_name,
-                    location_type__name = "City",
+                    location_type = city_loc_type,
                     status = active_status,
                     parent = state,
                 )
@@ -173,7 +177,7 @@ class WayneImportLocations(Job):
                     city.validated_save()
                 new_loc = Location.objects.create(
                     name = location_name,
-                    location_type__name = location_type__name,
+                    location_type = new_loc_type,
                     status = active_status,
                     parent = city,
                 )
@@ -181,6 +185,11 @@ class WayneImportLocations(Job):
             except ValidationError:
                 self.logger.warning(
                     msg=f"Cannot Load Location {row}. Validation Error.",
+                )
+                continue
+            except IntegrityError:
+                self.logger.warning(
+                    msg=f"Cannot Load Location {row}. Integrity Error.",
                 )
                 continue            
             
