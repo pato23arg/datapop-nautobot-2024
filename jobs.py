@@ -7,7 +7,7 @@ from nautobot.extras.jobs import BooleanVar, Job, FileVar, ObjectVar, IntegerVar
 from nautobot.extras.models import Status
 from nautobot.dcim.models import Device, Location, LocationType
 
-jobs = datapop_jobs
+# jobs = datapop_jobs
 
 name = "Data Population Jobs"
 
