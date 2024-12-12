@@ -125,7 +125,7 @@ class WayneImportLocations(Job):
                 name=location_name,
                 location_type__name=location_type__name,
             ).first()
-            if location_qs.exists():
+            if location_qs:
                 self.logger.info(
                     msg=f"Skipping Location {row}. Already exists.",
                 )
