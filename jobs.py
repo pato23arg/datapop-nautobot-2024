@@ -2,7 +2,8 @@
 import csv
 import json
 from nautobot.core.celery import register_jobs
-from django.core.exceptions import ValidationError, IntegrityError
+from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 from nautobot.extras.jobs import BooleanVar, Job, FileVar, ObjectVar, IntegerVar
 from nautobot.extras.models import Status
 from nautobot.dcim.models import Device, Location, LocationType
