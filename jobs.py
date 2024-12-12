@@ -169,7 +169,7 @@ class WayneImportLocations(Job):
                 if created:
                     state.validated_save()
                 city, created = Location.objects.get_or_create(
-                    name = state_name,
+                    name = city_name,
                     location_type = city_loc_type,
                     status = active_status,
                     parent = state,
