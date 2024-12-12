@@ -23,12 +23,13 @@ sync_devices:
     commands:
       - command: "show interface all | as json"
         parser: "none"
-        jpath: 'interfaces[*].subinterfaces[*].{interface: @.name, ip: "address"[0].prefix}'
-        post_processor: "{{ (obj | selectattr('enabled', 'eq', 'up') | list | first ).name }}"
+        jpath: 'interfaces[].subinterfaces[].{interface: @.name, ip: "address"[0].prefix}'
+        post_processor: '{{ {"interface": obj[0]["interface"], "ip": obj[0]["ip"].split('/')[0]} if obj and obj[0] else None }}'
+"
   mask_length:
     commands:
       - command: "show interface all | as json"
         parser: "none"
-        jpath: 'interfaces[*].subinterfaces[*].{interface: @.name, ip: "address"[0].prefix}'
-        post_processor: "{{ obj | unique | first }}"
-        iterable_type: "int"
+        jpath: 'interfaces[].subinterfaces[].{interface: @.name, ip: "address"[0].prefix}'
+        post_processor: '{{ obj[0]["ip"].split('/')[1] if obj and obj[0] and '/' in obj[0]["ip"] else None }}'
+        # iterable_type: "int"
